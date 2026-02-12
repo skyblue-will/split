@@ -1,4 +1,4 @@
-const CACHE = 'split-v1';
+const CACHE = 'split-v2';
 const ASSETS = [
   './',
   './index.html',

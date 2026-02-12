@@ -67,6 +67,7 @@ body {
 .header {
   text-align: center;
   padding: 32px 0 28px;
+  position: relative;
 }
 
 .logo {
@@ -861,34 +862,30 @@ body {
 }
 
 /* ---- Help Button (home header) ---- */
-.header {
-  position: relative;
-}
-
 .btn-help {
   position: absolute;
   top: 32px;
   right: 0;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  border: 1px solid var(--surface-3);
+  border: 2px solid var(--primary);
   background: var(--surface);
-  color: var(--text-2);
+  color: var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  z-index: 5;
 }
 
 .btn-help:active {
-  background: var(--surface-2);
-  color: var(--text);
+  background: var(--primary-dim);
 }
 
 .btn-help svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
 }
 
 /* ---- Help View ---- */

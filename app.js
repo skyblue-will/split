@@ -163,17 +163,22 @@
   /* ============ Rendering ============ */
   var $app = document.getElementById('app');
 
+  var SEEN_KEY = 'split_seen_help';
+
   function nav(view, data) {
     if (view === 'home')   renderHome();
     if (view === 'create') renderCreate(data);
     if (view === 'timer')  launchTimer(data);
+    if (view === 'help')   renderHelp();
   }
 
   /* ---- Home ---- */
   function renderHome() {
     editing = null;
     var html = '<div class="home-view">';
-    html += '<header class="header"><h1 class="logo"><span>S</span>PLIT</h1><p class="tagline">Circuit Training Timer</p></header>';
+    html += '<header class="header">'
+      + '<button class="btn-help" data-action="go-help" title="How to use"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>'
+      + '<h1 class="logo"><span>S</span>PLIT</h1><p class="tagline">Circuit Training Timer</p></header>';
 
     if (workouts.length) {
       html += '<section class="section"><h2 class="section-title">Your Workouts</h2><div class="workout-list">';
@@ -212,6 +217,77 @@
     }
     html += '</div></section></div>';
     $app.innerHTML = html;
+  }
+
+  /* ---- Help / How To ---- */
+  function renderHelp() {
+    $app.innerHTML = '<div class="help-view">'
+      + '<div class="help-header">'
+      + '<button class="btn-back" data-action="go-home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg></button>'
+      + '<h2>How It Works</h2>'
+      + '</div>'
+
+      + '<div class="help-steps">'
+
+      + '<div class="help-step">'
+      + '<div class="help-step-num">1</div>'
+      + '<div class="help-step-body">'
+      + '<h3>Pick or Build a Circuit</h3>'
+      + '<p>Tap a <strong>Quick Start</strong> preset to go immediately, or hit <strong>New Workout</strong> to build your own. Name it, set your exercises, work times, rest times, and rounds.</p>'
+      + '</div></div>'
+
+      + '<div class="help-step">'
+      + '<div class="help-step-num">2</div>'
+      + '<div class="help-step-body">'
+      + '<h3>Hit Start</h3>'
+      + '<p>Tap the green play button. You get a <strong>3-2-1-GO</strong> countdown to get into position, then the timer runs your entire circuit automatically.</p>'
+      + '</div></div>'
+
+      + '<div class="help-step">'
+      + '<div class="help-step-num">3</div>'
+      + '<div class="help-step-body">'
+      + '<h3>Train Hands-Free</h3>'
+      + '<p><strong class="clr-primary">Green = WORK.</strong> <strong class="clr-accent">Orange = REST.</strong> Audio beeps and vibration tell you when to switch. No touching your phone mid-set.</p>'
+      + '</div></div>'
+
+      + '</div>'
+
+      + '<div class="help-section">'
+      + '<h3 class="help-section-title">During a Workout</h3>'
+      + '<ul class="help-list">'
+      + '<li><strong>Pause</strong> anytime with the centre button, pick up where you left off</li>'
+      + '<li><strong>Skip Rest</strong> appears during rest intervals if you want to push through</li>'
+      + '<li>The <strong>ring</strong> drains as each interval counts down</li>'
+      + '<li>The <strong>progress bar</strong> at the bottom shows overall circuit progress</li>'
+      + '<li><strong>X button</strong> (top right) stops the workout entirely</li>'
+      + '</ul>'
+      + '</div>'
+
+      + '<div class="help-section">'
+      + '<h3 class="help-section-title">Tips</h3>'
+      + '<ul class="help-list">'
+      + '<li>Turn your <strong>volume up</strong> &mdash; audio cues are the whole point</li>'
+      + '<li>Prop your phone on a bench or against a rack &mdash; the timer is big enough to read from a few metres away</li>'
+      + '<li>Your <strong>screen stays on</strong> during workouts automatically</li>'
+      + '<li>Tap a saved workout card to <strong>edit</strong> it, or the green play button to start it</li>'
+      + '<li>Hit <strong>Save</strong> on any preset to copy it to your workouts and customise it</li>'
+      + '</ul>'
+      + '</div>'
+
+      + '<div class="help-section">'
+      + '<h3 class="help-section-title">Install on Your Phone</h3>'
+      + '<ul class="help-list">'
+      + '<li><strong>Android:</strong> In Chrome, tap the menu &#8942; then "Add to Home Screen" or "Install App"</li>'
+      + '<li><strong>iPhone:</strong> In Safari, tap Share then "Add to Home Screen"</li>'
+      + '<li>Works <strong>offline</strong> after first load &mdash; no internet needed at the gym</li>'
+      + '</ul>'
+      + '</div>'
+
+      + '<button class="btn btn-primary btn-block btn-lg" data-action="go-home" style="margin-top:24px">Got It</button>'
+
+      + '</div>';
+
+    localStorage.setItem(SEEN_KEY, '1');
   }
 
   /* ---- Create / Edit ---- */
@@ -544,6 +620,10 @@
         nav('create');
         break;
 
+      case 'go-help':
+        nav('help');
+        break;
+
       case 'edit-workout':
         var ew = workouts.find(function(x){ return x.id === id; });
         if (ew) nav('create', JSON.parse(JSON.stringify(ew)));
@@ -670,6 +750,10 @@
 
   /* ============ Init ============ */
   load();
-  nav('home');
+  if (!localStorage.getItem(SEEN_KEY)) {
+    nav('help');
+  } else {
+    nav('home');
+  }
 
 })();

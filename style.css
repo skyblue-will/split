@@ -860,6 +860,153 @@ body {
   font-size: 14px;
 }
 
+/* ---- Help Button (home header) ---- */
+.header {
+  position: relative;
+}
+
+.btn-help {
+  position: absolute;
+  top: 32px;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--surface-3);
+  background: var(--surface);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.btn-help:active {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.btn-help svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---- Help View ---- */
+.help-view {
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 20px;
+  padding-top: calc(20px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+}
+
+.help-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0 28px;
+}
+
+.help-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* Steps */
+.help-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.help-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  animation: slideIn 0.3s ease both;
+}
+
+.help-step:nth-child(2) { animation-delay: 0.05s; }
+.help-step:nth-child(3) { animation-delay: 0.1s; }
+
+.help-step-num {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--bg);
+  font-size: 18px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.help-step-body h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.help-step-body p {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+/* Sections */
+.help-section {
+  margin-bottom: 24px;
+}
+
+.help-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 10px;
+}
+
+.help-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.help-list li {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.5;
+  padding-left: 16px;
+  position: relative;
+}
+
+.help-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--surface-3);
+}
+
+.help-list li strong {
+  color: var(--text);
+}
+
+.clr-primary { color: var(--primary) !important; }
+.clr-accent { color: var(--accent) !important; }
+
 /* ---- Animations ---- */
 @keyframes slideIn {
   from { opacity: 0; transform: translateY(8px); }

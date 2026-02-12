@@ -872,6 +872,9 @@ body {
   border: 2px solid var(--primary);
   background: var(--surface);
   color: var(--primary);
+  font-family: var(--font);
+  font-size: 22px;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -881,11 +884,6 @@ body {
 
 .btn-help:active {
   background: var(--primary-dim);
-}
-
-.btn-help svg {
-  width: 22px;
-  height: 22px;
 }
 
 /* ---- Help View ---- */

@@ -1,0 +1,1099 @@
+/* ============================================
+   SPLIT - Circuit Training Timer
+   ============================================ */
+
+/* ---- Reset & Variables ---- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface-2: #1c1c26;
+  --surface-3: #26263a;
+  --primary: #00e676;
+  --primary-dim: rgba(0,230,118,0.12);
+  --primary-glow: rgba(0,230,118,0.35);
+  --accent: #ff6b35;
+  --accent-dim: rgba(255,107,53,0.12);
+  --accent-glow: rgba(255,107,53,0.35);
+  --danger: #ff3b3b;
+  --text: #f0f0f5;
+  --text-2: #8888aa;
+  --text-3: #555566;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  --radius: 16px;
+  --radius-sm: 10px;
+  color-scheme: dark;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+#app {
+  max-width: 480px;
+  margin: 0 auto;
+  height: 100%;
+  height: 100dvh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---- Scrollable views ---- */
+.home-view,
+.create-view {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 20px;
+  padding-top: calc(20px + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ---- Header ---- */
+.header {
+  text-align: center;
+  padding: 32px 0 28px;
+}
+
+.logo {
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 8px;
+  color: var(--text);
+  position: relative;
+}
+
+.logo span {
+  color: var(--primary);
+}
+
+.tagline {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ---- Sections ---- */
+.section {
+  margin-top: 32px;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 12px;
+}
+
+/* ---- Workout Cards ---- */
+.workout-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.workout-card {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  border: 1px solid transparent;
+}
+
+.workout-card:active {
+  transform: scale(0.98);
+  background: var(--surface-2);
+}
+
+.workout-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.workout-card-name {
+  font-size: 17px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.workout-card-meta {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-top: 3px;
+}
+
+.btn-play {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s, opacity 0.15s;
+}
+
+.btn-play:active {
+  transform: scale(0.9);
+}
+
+.btn-play svg {
+  width: 20px;
+  height: 20px;
+  margin-left: 2px;
+}
+
+/* ---- Preset Cards ---- */
+.preset-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preset-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  border: 1px solid var(--surface-2);
+}
+
+.preset-card-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.preset-card-meta {
+  font-size: 13px;
+  color: var(--text-2);
+  margin-top: 3px;
+}
+
+.preset-card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: transform 0.12s, opacity 0.12s, background 0.15s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #0a0a0f;
+}
+
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+  border: 1px solid var(--surface-3);
+}
+
+.btn-ghost:active {
+  background: var(--surface-2);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-lg {
+  padding: 16px 24px;
+  font-size: 16px;
+  border-radius: var(--radius);
+}
+
+.btn-sm {
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.btn-icon:active {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.btn-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.btn-icon-danger:active {
+  color: var(--danger);
+}
+
+/* ---- Create View ---- */
+.create-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0 24px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+}
+
+.create-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.btn-back {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: none;
+  background: var(--surface);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-back svg {
+  width: 20px;
+  height: 20px;
+}
+
+.btn-delete-workout {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--danger);
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.btn-delete-workout:active {
+  background: rgba(255,59,59,0.1);
+}
+
+/* ---- Form Controls ---- */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--surface-3);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+}
+
+.form-input::placeholder {
+  color: var(--text-3);
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.flex-1 { flex: 1; }
+
+/* ---- Stepper ---- */
+.stepper {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--surface-3);
+  overflow: hidden;
+}
+
+.stepper-btn {
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: none;
+  color: var(--primary);
+  font-size: 22px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+}
+
+.stepper-btn:active {
+  background: var(--surface-2);
+}
+
+.stepper-value {
+  flex: 1;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--mono);
+  padding: 0 4px;
+}
+
+/* ---- Time Input Group ---- */
+.time-input-group {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--surface-3);
+  padding: 4px;
+}
+
+.time-input {
+  width: 48px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  appearance: none;
+}
+
+.time-input::-webkit-inner-spin-button,
+.time-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.time-input:focus {
+  background: var(--surface-2);
+  border-radius: 6px;
+}
+
+.time-sep {
+  color: var(--text-3);
+  font-family: var(--mono);
+  font-size: 18px;
+  font-weight: 700;
+  padding: 0 2px;
+}
+
+/* ---- Exercise Cards ---- */
+.exercise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.exercise-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 14px;
+  border: 1px solid var(--surface-2);
+  animation: slideIn 0.2s ease;
+}
+
+.exercise-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.exercise-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--surface-3);
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.exercise-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+.exercise-card-actions {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.exercise-times {
+  display: flex;
+  gap: 12px;
+  padding-left: 38px;
+}
+
+.time-group {
+  flex: 1;
+}
+
+.time-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.work-label { color: var(--primary); }
+.rest-label { color: var(--accent); }
+
+/* ---- Create Footer ---- */
+.create-footer {
+  position: sticky;
+  bottom: 0;
+  padding: 16px 0 20px;
+  background: linear-gradient(0deg, var(--bg) 80%, transparent);
+  margin: 0 -20px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* ---- Timer View ---- */
+.timer-view {
+  height: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: env(safe-area-inset-top, 0px) 20px env(safe-area-inset-bottom, 0px);
+  transition: background 0.4s ease;
+}
+
+.timer-view.work-phase {
+  background: radial-gradient(ellipse at 50% 30%, var(--primary-dim), var(--bg) 70%);
+}
+
+.timer-view.rest-phase {
+  background: radial-gradient(ellipse at 50% 30%, var(--accent-dim), var(--bg) 70%);
+}
+
+.timer-stop {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-2);
+  color: var(--text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.timer-stop svg {
+  width: 20px;
+  height: 20px;
+}
+
+.timer-round {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--text-2);
+  margin-bottom: 24px;
+}
+
+/* ---- Timer Ring ---- */
+.timer-ring-container {
+  position: relative;
+  width: 280px;
+  height: 280px;
+}
+
+.timer-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-bg {
+  fill: none;
+  stroke: var(--surface-2);
+  stroke-width: 8;
+}
+
+.ring-progress {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.15s linear;
+}
+
+.ring-progress.work {
+  stroke: var(--primary);
+  filter: drop-shadow(0 0 10px var(--primary-glow));
+}
+
+.ring-progress.rest {
+  stroke: var(--accent);
+  filter: drop-shadow(0 0 10px var(--accent-glow));
+}
+
+.timer-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 100%;
+  padding: 0 30px;
+}
+
+.timer-type {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.timer-type.work { color: var(--primary); }
+.timer-type.rest { color: var(--accent); }
+
+.timer-name {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timer-time {
+  font-family: var(--mono);
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -3px;
+}
+
+.timer-time.warning {
+  color: var(--danger);
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+.timer-next {
+  margin-top: 28px;
+  font-size: 14px;
+  color: var(--text-3);
+  text-align: center;
+  min-height: 20px;
+}
+
+/* ---- Timer Controls ---- */
+.timer-controls {
+  margin-top: 32px;
+}
+
+.btn-timer-control {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--surface-3);
+  background: var(--surface);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.12s, background 0.15s;
+}
+
+.btn-timer-control:active {
+  transform: scale(0.92);
+  background: var(--surface-2);
+}
+
+.btn-timer-control svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* ---- Progress Bar ---- */
+.timer-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--surface);
+}
+
+.timer-progress-fill {
+  height: 100%;
+  transition: width 0.3s linear;
+  border-radius: 0 2px 2px 0;
+}
+
+.timer-progress-fill.work { background: var(--primary); }
+.timer-progress-fill.rest { background: var(--accent); }
+
+/* ---- Countdown Phase ---- */
+.countdown-phase {
+  background: var(--bg);
+}
+
+.countdown-container {
+  text-align: center;
+}
+
+.countdown-number {
+  font-family: var(--mono);
+  font-size: 140px;
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1;
+  text-shadow: 0 0 60px var(--primary-glow);
+}
+
+.countdown-number.pop {
+  animation: countdownPop 0.4s ease-out;
+}
+
+.countdown-label {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 5px;
+  color: var(--text-2);
+  margin-top: 16px;
+}
+
+.countdown-workout-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-3);
+  margin-top: 8px;
+}
+
+/* ---- Complete Phase ---- */
+.complete-phase {
+  background: var(--bg);
+}
+
+.complete-container {
+  text-align: center;
+  padding: 0 24px;
+  width: 100%;
+  animation: fadeScaleIn 0.5s ease;
+}
+
+.complete-check {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--primary-dim);
+  border: 3px solid var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+}
+
+.complete-check svg {
+  width: 40px;
+  height: 40px;
+  color: var(--primary);
+}
+
+.complete-title {
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  margin-bottom: 32px;
+}
+
+.complete-stats {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 40px;
+}
+
+.stat {
+  flex: 1;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px 8px;
+}
+
+.stat-value {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ---- Empty State ---- */
+.empty-state {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-3);
+  font-size: 14px;
+}
+
+/* ---- Animations ---- */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeScaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes countdownPop {
+  0% { transform: scale(0.6); opacity: 0.5; }
+  60% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 20px var(--primary-glow); }
+  50% { box-shadow: 0 0 40px var(--primary-glow); }
+}
+
+/* ---- Skip Button (during rest) ---- */
+.btn-skip {
+  position: absolute;
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-3);
+  background: none;
+  border: 1px solid var(--surface-3);
+  padding: 8px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.btn-skip:active {
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 360px) {
+  .timer-ring-container {
+    width: 240px;
+    height: 240px;
+  }
+  .timer-time {
+    font-size: 60px;
+  }
+  .timer-name {
+    font-size: 18px;
+  }
+  .exercise-times {
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 0;
+  }
+}
+
+@media (min-height: 800px) {
+  .timer-ring-container {
+    width: 300px;
+    height: 300px;
+  }
+  .timer-time {
+    font-size: 80px;
+  }
+}
+
+/* ============================================
+   Wearable / Smartwatch (Wear OS)
+   ============================================
+   Wear OS watches: ~360x360 to ~450x450, often round.
+   Key: small AND short viewport = watch (phones are tall).
+   ============================================ */
+
+/* ---- Small square screens (watch-sized) ---- */
+@media (max-width: 450px) and (max-height: 450px) {
+
+  .home-view,
+  .create-view {
+    padding: 8px 12px;
+    padding-bottom: 20px;
+  }
+
+  /* Header - compact */
+  .header { padding: 8px 0 6px; }
+  .logo { font-size: 22px; letter-spacing: 4px; }
+  .tagline { display: none; }
+  .section-title { font-size: 9px; margin-bottom: 6px; }
+
+  /* Home - slim cards, hide presets */
+  .workout-list { gap: 6px; }
+  .workout-card { padding: 10px 12px; border-radius: 12px; }
+  .workout-card-name { font-size: 14px; }
+  .workout-card-meta { font-size: 11px; }
+  .btn-play { width: 36px; height: 36px; }
+  .btn-play svg { width: 14px; height: 14px; }
+  .preset-grid { display: none; }
+  .section:has(.preset-grid) .section-title { display: none; }
+  .btn-block.btn-lg { padding: 10px 16px; font-size: 13px; border-radius: 10px; }
+  .btn-block.btn-lg svg { width: 14px; height: 14px; }
+
+  /* Create - tighter spacing */
+  .create-header { padding: 8px 0 10px; }
+  .create-header h2 { font-size: 16px; }
+  .btn-back { width: 32px; height: 32px; }
+  .btn-back svg { width: 16px; height: 16px; }
+  .form-group { margin-bottom: 12px; }
+  .form-label { font-size: 10px; margin-bottom: 4px; }
+  .form-input { padding: 10px 12px; font-size: 14px; }
+  .stepper-btn { width: 36px; height: 36px; font-size: 18px; }
+  .stepper-value { font-size: 16px; }
+  .exercise-card { padding: 10px; }
+  .exercise-number { width: 22px; height: 22px; font-size: 11px; }
+  .exercise-name { font-size: 13px; padding: 8px 10px; }
+  .exercise-times { padding-left: 32px; gap: 8px; }
+  .time-input { width: 36px; height: 32px; font-size: 14px; }
+  .time-sep { font-size: 14px; }
+  .time-label { font-size: 9px; }
+  .exercise-card-actions { gap: 0; }
+  .btn-icon { width: 28px; height: 28px; }
+  .btn-icon svg { width: 14px; height: 14px; }
+  .create-footer { padding: 8px 20px 10px; }
+
+  /* Timer - THE key screen on a watch */
+  .timer-view { padding: 4px 8px; }
+  .timer-stop { top: 4px; right: 4px; width: 28px; height: 28px; }
+  .timer-stop svg { width: 14px; height: 14px; }
+  .timer-round { font-size: 9px; letter-spacing: 2px; margin-bottom: 4px; }
+
+  .timer-ring-container { width: 190px; height: 190px; }
+  .ring-bg { stroke-width: 6; }
+  .ring-progress { stroke-width: 6; }
+
+  .timer-type { font-size: 9px; letter-spacing: 3px; margin-bottom: 2px; }
+  .timer-name { font-size: 14px; margin-bottom: 4px; }
+  .timer-time { font-size: 44px; letter-spacing: -2px; }
+  .timer-center { padding: 0 20px; }
+
+  .timer-next { font-size: 10px; margin-top: 6px; }
+  .timer-controls { margin-top: 6px; }
+  .btn-timer-control { width: 44px; height: 44px; }
+  .btn-timer-control svg { width: 20px; height: 20px; }
+  .btn-skip { display: none; }
+
+  /* Countdown */
+  .countdown-number { font-size: 80px; }
+  .countdown-label { font-size: 10px; letter-spacing: 3px; margin-top: 8px; }
+  .countdown-workout-name { font-size: 11px; }
+
+  /* Complete */
+  .complete-check { width: 48px; height: 48px; margin-bottom: 12px; }
+  .complete-check svg { width: 24px; height: 24px; }
+  .complete-title { font-size: 20px; letter-spacing: 2px; margin-bottom: 16px; }
+  .complete-stats { gap: 4px; margin-bottom: 16px; }
+  .stat { padding: 8px 4px; border-radius: 10px; }
+  .stat-value { font-size: 16px; }
+  .stat-label { font-size: 8px; }
+  .complete-container .btn { padding: 10px 16px; font-size: 13px; }
+}
+
+/* ---- Round displays (most Wear OS watches) ---- */
+@media (shape: round) {
+
+  #app {
+    overflow: hidden;
+  }
+
+  /* Round safe zone: content outside the inscribed square gets clipped.
+     For a 360px circle, safe square is ~254px.
+     We pad ~14% on each side to stay in the safe zone. */
+  .home-view,
+  .create-view {
+    padding-left: 14%;
+    padding-right: 14%;
+    padding-top: 18%;
+    padding-bottom: 18%;
+  }
+
+  /* Timer - ring is already circular, perfect for round face */
+  .timer-view {
+    padding: 10% 8%;
+  }
+
+  .timer-stop { display: none; }
+  .timer-round { display: none; }
+  .timer-next { display: none; }
+  .timer-progress-bar { display: none; }
+
+  /* The ring IS the watch bezel visual */
+  .timer-ring-container {
+    width: 75vw;
+    height: 75vw;
+    max-width: 280px;
+    max-height: 280px;
+  }
+
+  .ring-bg { stroke-width: 10; }
+  .ring-progress { stroke-width: 10; }
+
+  /* Bigger pause button for fat-finger tapping */
+  .btn-timer-control {
+    width: 52px;
+    height: 52px;
+    border-width: 1px;
+  }
+
+  /* Complete screen */
+  .complete-container { padding: 0 8%; }
+  .complete-stats { flex-direction: column; gap: 4px; }
+  .stat { padding: 6px 4px; }
+  .complete-check { width: 44px; height: 44px; margin-bottom: 8px; }
+  .complete-check svg { width: 22px; height: 22px; }
+  .complete-title { font-size: 18px; margin-bottom: 12px; }
+
+  /* Countdown */
+  .countdown-number { text-shadow: 0 0 40px var(--primary-glow); }
+}
+
+/* ---- Tiny round watch (combined) ---- */
+@media (max-width: 400px) and (max-height: 400px) and (shape: round) {
+  .timer-ring-container { width: 65vw; height: 65vw; }
+  .timer-time { font-size: 36px; }
+  .timer-name { font-size: 12px; }
+  .timer-type { font-size: 8px; letter-spacing: 2px; }
+  .countdown-number { font-size: 60px; }
+  .btn-timer-control { width: 40px; height: 40px; }
+  .btn-timer-control svg { width: 16px; height: 16px; }
+}
